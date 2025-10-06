@@ -22,18 +22,25 @@
 ### 2.1. Команды резервирования и восстановления
 
 Резервирование (pg_dump):
+
 bash
+
 pg_dump -U username -h host -F c -b -v -f backup.dump dbname
 
 Восстановление (pg_restore):
+
 bash
+
 pg_restore -U username -h host -v -d dbname backup.dump
 
 2.1.* Автоматизация процесса
 
 Да, возможно через планировщик cron:
+
 bash
+
 0 2 * * * pg_dump -U user -F c -f /backups/db_$(date +\%Y\%m\%d).dump dbname
+
 Специализированные инструменты: Barman, pgBackRest. Скрипты для ротации бэкапов и уведомлений
 
 Задание 3. MySQL
@@ -41,27 +48,39 @@ bash
 3.1. Инкрементное резервное копирование
 
 Активация бинарных логов в my.cnf:
+
 ini
+
 log_bin = /var/log/mysql/mysql-bin.log
 
 Полный бэкап:
+
 bash
+
 mysqldump -u root -p --flush-logs --master-data=2 dbname > full_backup.sql
 
 Инкрементный бэкап:
+
 bash
+
 mysqladmin -u root -p flush-logs
+
 cp /var/log/mysql/mysql-bin.00000* /backup/incremental/
 
-Восстановление:
-bash
+## Восстановление:
+
 # Восстановление полного бэкапа
+
+bash
+
 mysql -u root -p < full_backup.sql
 
 # Применение инкрементных изменений
+
 mysqlbinlog mysql-bin.000001 | mysql -u root -p
 
 3.1.* Преимущества реплики
+
 Минимальный downtime: Быстрое переключение на реплику
 
 Распределение нагрузки: Чтение можно перенести на реплики
